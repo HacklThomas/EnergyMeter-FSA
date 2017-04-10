@@ -1,31 +1,7 @@
 #include "main.h"
 
 //--------------------------------------------------------------
-// Setzen der Uhrzeit
-//-------------------------------------------------------------
-void setTime() {
-	int eingabe;
-	do {
-		eingabe = receiveData();
-	} while (eingabe == -1);
-	UB_RTC.jahr = eingabe;
-	do {
-		eingabe = receiveData();
-	} while (eingabe == -1);
-	UB_RTC.monat = eingabe;
-	do {
-		eingabe = receiveData();
-	} while (eingabe == -1);
-	UB_RTC.tag = eingabe;
-	do {
-		eingabe = receiveData();
-	} while (eingabe == -1);
-	UB_RTC.std = eingabe;
-	do {
-		eingabe = receiveData();
-	} while (eingabe == -1);
-	UB_RTC.min = eingabe;
-	do {
+// Setzen der Uhrzei
 		eingabe = receiveData();
 	} while (eingabe == -1);
 	UB_RTC.sek = eingabe;
@@ -35,7 +11,7 @@ void setTime() {
 }
 
 //--------------------------------------------------------------
-// Senden von Daten über UART und USB
+// Senden von Daten Ã¼ber UART und USB
 //--------------------------------------------------------------
 void sendData(char* data) {
 	if (interface == BLUETOOTH) {
@@ -46,7 +22,7 @@ void sendData(char* data) {
 }
 
 //--------------------------------------------------------------
-// Empfangen von Daten über UART und USB
+// Empfangen von Daten Ã¼ber UART und USB
 //--------------------------------------------------------------
 int receiveData() {
 	char data[5];
@@ -63,7 +39,7 @@ int receiveData() {
 }
 
 //--------------------------------------------------------------
-// Überprüfung, ob sich der Status geändert hat
+// ÃœberprÃ¼fung, ob sich der Status geÃ¤ndert hat
 //--------------------------------------------------------------
 bool_t checkForStateChange() {
 	int ret = receiveData();
@@ -96,7 +72,7 @@ bool_t checkForStateChange() {
 }
 
 //--------------------------------------------------------------
-// Zählen der Dateien auf der SD-Karte
+// ZÃ¤hlen der Dateien auf der SD-Karte
 //--------------------------------------------------------------
 int countFiles() {
 	int ret = 0;
@@ -151,9 +127,9 @@ void saveData() {
 	savedatatimer = 0;
 	char text[15];
 	uint32_t difference;
-	// Daten an Dateiende anhängen
+	// Daten an Dateiende anhÃ¤ngen
 	f_lseek(&fil, f_size(&fil));
-	// Zeitdifferenz zum vorigen Wert einfügen
+	// Zeitdifferenz zum vorigen Wert einfÃ¼gen
 	difference = timer - oldtimerval;
 	oldtimerval = timer;
 	snprintf(text, sizeof(text), "%4ld\t\t", difference);
@@ -184,7 +160,7 @@ void saveData() {
 }
 
 //--------------------------------------------------------------
-// Berechnen des CRC für die Kommunikation mit dem IVT-A
+// Berechnen des CRC fÃ¼r die Kommunikation mit dem IVT-A
 //--------------------------------------------------------------
 uint16_t crc16_update(uint16_t crc, uint8_t a) {
 	int i;
@@ -212,7 +188,7 @@ int32_t interpret24bitAsInt32(uint8_t data1, uint8_t data2, uint8_t data3) {
 }
 
 //--------------------------------------------------------------
-// Anelgen einer neuen Datei und Einfügen des Headers
+// Anelgen einer neuen Datei und EinfÃ¼gen des Headers
 //--------------------------------------------------------------
 void insertHeaderToFile() {
 	char text[40];
@@ -227,7 +203,7 @@ void insertHeaderToFile() {
 	if (f_open(&fil, "allFiles.txt", FA_CREATE_NEW) == FR_EXIST) {
 		f_open(&fil, "allFiles.txt", FA_WRITE);
 	}
-	// Ermitteln des nächsten Dateinamens
+	// Ermitteln des nÃ¤chsten Dateinamens
 	if (f_size(&fil) <= 5) {
 		temp = 1;
 	} else {
@@ -239,7 +215,7 @@ void insertHeaderToFile() {
 	f_lseek(&fil, f_size(&fil));
 	f_puts(text, &fil);
 	f_close(&fil);
-	// Einfügen allgemeiner Daten in die neue Datei
+	// EinfÃ¼gen allgemeiner Daten in die neue Datei
 	sprintf(text, "%i.txt", temp);
 	f_open(&fil, text, FA_CREATE_ALWAYS | FA_WRITE);
 	f_puts(buffer, &fil);
@@ -253,7 +229,7 @@ void insertHeaderToFile() {
 }
 
 //--------------------------------------------------------------
-// Verschlüsseln der Daten
+// VerschlÃ¼sseln der Daten
 //--------------------------------------------------------------
 void encrypt_cbc() {
 	uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab,
@@ -289,7 +265,7 @@ void sendCyphertext() {
 }
 
 //--------------------------------------------------------------
-// Senden der Daten über CAN (Errorbits / Spannung / Strom / Temperatur)
+// Senden der Daten Ã¼ber CAN (Errorbits / Spannung / Strom / Temperatur)
 //--------------------------------------------------------------
 void sendCAN() {
 	CAN1_TX_FRAME_t TXFrame;
