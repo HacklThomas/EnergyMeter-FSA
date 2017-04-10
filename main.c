@@ -22,6 +22,8 @@ int main(void) {
 	uint32_t pointer = 0;
 	int ret = 5;
 	int temp = 0;
+	char buffer[64];
+	bool_t prevcanstate;
 
 	for (int i = 0; i < 64; i++) {
 		cyphertext[i] = 0x00;
@@ -35,14 +37,13 @@ int main(void) {
 			break;
 		case LOGGING:
 			if (checkForStateChange() == TRUE) {
-				f_puts("END!\n", &fil);
 				f_close(&fil);
 				f_mount(0, "", 1);
 			}
 			break;
 		case LISTFILES:
-			prevcanstate = canactive;
-			canactive = 0;
+			prevcanstate = canstate;
+			canstate = FALSE;
 			Led_On(LED_RED);
 			f_mount(&FatFs, "", 1);
 			temp = countFiles();
@@ -56,10 +57,10 @@ int main(void) {
 				ret--;
 				buffer[ret] = 0x00;
 				sendData(buffer);
-				sendData(" - Size (Bytes): ");
+				sendData(" - Size (kB): ");
 				sprintf(buffer, "%i.txt", i);
 				f_open(&fil, buffer, FA_READ);
-				itoa(f_size(&fil), buffer, 10);
+				itoa(f_size(&fil) / 1000, buffer, 10);
 				sendData(buffer);
 				sendData("\n");
 				f_close(&fil);
@@ -71,11 +72,11 @@ int main(void) {
 			f_mount(0, "", 1);
 			Led_Off(LED_RED);
 			state = IDLE;
-			canactive = prevcanstate;
+			canstate = prevcanstate;
 			break;
 		case AUSLESEN:
-			prevcanstate = canactive;
-			canactive = 0;
+			prevcanstate = canstate;
+			canstate = FALSE;
 			f_mount(&FatFs, "", 1);
 			Led_On(LED_RED);
 			do {
@@ -88,7 +89,7 @@ int main(void) {
 				f_gets(buffer, sizeof(buffer), &fil);
 				sendData(buffer);
 				temp++;
-				encrypt_cbc();
+				encrypt_cbc(buffer);
 				if (temp > 200) {
 					temp = 0;
 					sendCyphertext();
@@ -98,6 +99,7 @@ int main(void) {
 				}
 			}
 			sendCyphertext();
+			sendData("ENDE");
 			temp = 0;
 			f_close(&fil);
 			f_mount(0, "", 1);
@@ -106,7 +108,7 @@ int main(void) {
 			for (int i = 0; i < 64; i++) {
 				cyphertext[i] = 0x00;
 			}
-			canactive = prevcanstate;
+			canstate = prevcanstate;
 			break;
 		case SETTIME:
 			Led_On(LED_RED);
@@ -140,23 +142,13 @@ int main(void) {
 			state = IDLE;
 			break;
 		case IDLE:
-			Led_On(LED_ORANGE);
-			if (checkForStateChange()) {
-				Led_Off(LED_ORANGE);
-			}
-			break;
-		case SETHC:
-			UB_Systick_Pause_ms(800);
-			Led_Toggle(LED_RED);
-			Uart_SendString(COM1, "AT+NAMELOGGER\n", NONE);
-			Uart_ReceiveString(COM1, buffer);
-			TM_USB_VCP_Puts(buffer);
+			checkForStateChange();
 			break;
 		case TOGGLECAN:
-			if (canactive == TRUE) {
-				canactive = FALSE;
+			if (canstate == TRUE) {
+				canstate = FALSE;
 			} else {
-				canactive = TRUE;
+				canstate = TRUE;
 			}
 			state = IDLE;
 			break;
