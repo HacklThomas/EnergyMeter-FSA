@@ -10,9 +10,9 @@
 // GCC      : 4.7 2012q4
 // Module   : GPIO, CAN, MISC
 // Funktion : CAN-LoLevel-Funktionen (per CAN-2)
-//            externer CAN-Transeiver wird benötigt
+//            externer CAN-Transeiver wird benÃ¶tigt
 //
-// Hinweis  : mögliche Pinbelegungen
+// Hinweis  : mÃ¶gliche Pinbelegungen
 //            CAN2 : TX:[PB6, PB13]
 //                   RX:[PB5, PB12]
 //
@@ -298,13 +298,13 @@ CAN2_STATUS_t UB_CAN2_receive(CAN2_RX_FRAME_t *rx_frame) {
 
 //--------------------------------------------------------------
 // setzt vier Filter auf std_id [11bit] + Mode
-// falls ein Filter nicht benötigt wird,
+// falls ein Filter nicht benÃ¶tigt wird,
 // dann den Filter doppelt anlegen
 //
 // Ein CAN-Frame kommt nur durch, wenn seine ID+Mode
 // in der Liste steht
 //
-// nr = [14...27] (für CAN2)
+// nr = [14...27] (fÃ¼r CAN2)
 //--------------------------------------------------------------
 void UB_CAN2_std_FilterList(CAN2_STD_FL_t filter, uint8_t nr) {
 	if (nr < 14)
@@ -327,13 +327,13 @@ void UB_CAN2_std_FilterList(CAN2_STD_FL_t filter, uint8_t nr) {
 
 //--------------------------------------------------------------
 // setzt zwei Filter auf std_id [11bit] + Mode mit Maske
-// falls ein Filter nicht benötigt wird,
+// falls ein Filter nicht benÃ¶tigt wird,
 // dann den Filter doppelt anlegen
 //
 // Ein CAN-Frame kommt nur durch, wenn seine ID+Mode
-// mit Hilfe der Maske übereinstimmt
+// mit Hilfe der Maske Ã¼bereinstimmt
 //
-// nr = [14...27] (für CAN2)
+// nr = [14...27] (fÃ¼r CAN2)
 //--------------------------------------------------------------
 void UB_CAN2_std_FilterMask(CAN2_STD_FM_t filter, uint8_t nr) {
 	if (nr < 14)
@@ -356,13 +356,13 @@ void UB_CAN2_std_FilterMask(CAN2_STD_FM_t filter, uint8_t nr) {
 
 //--------------------------------------------------------------
 // setzt zwei Filter auf ext_id [29bit] + Mode
-// falls ein Filter nicht benötigt wird,
+// falls ein Filter nicht benÃ¶tigt wird,
 // dann den Filter doppelt anlegen
 //
 // Ein CAN-Frame kommt nur durch, wenn seine ID+Mode
 // in der Liste steht
 //
-// nr = [14...27] (für CAN2)
+// nr = [14...27] (fÃ¼r CAN2)
 //--------------------------------------------------------------
 void UB_CAN2_ext_FilterList(CAN2_EXT_FL_t filter, uint8_t nr) {
 	if (nr < 14)
@@ -387,9 +387,9 @@ void UB_CAN2_ext_FilterList(CAN2_EXT_FL_t filter, uint8_t nr) {
 // setzt einen Filter auf ext_id [29bit] + Mode mit Maske
 //
 // Ein CAN-Frame kommt nur durch, wenn seine ID+Mode
-// mit Hilfe der Maske übereinstimmt
+// mit Hilfe der Maske Ã¼bereinstimmt
 //
-// nr = [14...27] (für CAN2)
+// nr = [14...27] (fÃ¼r CAN2)
 //--------------------------------------------------------------
 void UB_CAN2_ext_FilterMask(CAN2_EXT_FM_t filter, uint8_t nr) {
 	if (nr < 14)
@@ -772,6 +772,9 @@ void CAN2_RX0_IRQHandler(void) {
 		current = (CAN2_RxMessage.Data[2] * 0x1000000)
 				+ (CAN2_RxMessage.Data[3] * 0x10000)
 				+ (CAN2_RxMessage.Data[4] * 0x100) + (CAN2_RxMessage.Data[5]);
+		if(state == LOGGING){
+			saveData();
+		}
 	}
 	if (CAN2_RxMessage.StdId == 0x522) { // Voltage
 		voltage = (CAN2_RxMessage.Data[2] * 0x1000000)
@@ -782,8 +785,5 @@ void CAN2_RX0_IRQHandler(void) {
 		temperature = (CAN2_RxMessage.Data[2] * 0x1000000)
 				+ (CAN2_RxMessage.Data[3] * 0x10000)
 				+ (CAN2_RxMessage.Data[4] * 0x100) + (CAN2_RxMessage.Data[5]);
-	}
-	if(state == LOGGING){
-		saveData();
 	}
 }
