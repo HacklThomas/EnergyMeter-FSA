@@ -22,16 +22,13 @@
 typedef enum {
 	INITIALISIEREN = 0,
 	LOGGING = 1,
-	MENU = 2,
-	AUSLESEN = 3,
-	SETTIME = 4,
-	SETCAN = 5,
-	BLUETOOTHGRAPH = 6,
-	IDLE = 7,
-	DELETEFILES = 8,
-	LISTFILES = 9,
-	TOGGLECAN = 10,
-	SETHC = 12,
+	AUSLESEN = 2,
+	SETTIME = 3,
+	BLUETOOTHGRAPH = 4,
+	IDLE = 5,
+	DELETEFILES = 6,
+	LISTFILES = 7,
+	TOGGLECAN = 8,
 
 	TEST = 20
 } state_t;
@@ -44,57 +41,34 @@ typedef enum {
 	FALSE = 0, TRUE = 1
 } bool_t;
 
-uint16_t crc16_update(uint16_t crc, uint8_t a);
-int32_t interpret24bitAsInt32(uint8_t data1, uint8_t data2, uint8_t data3);
-void init();
+void init(void);
 void sendData(char* data);
-void saveData();
-int receiveData();
-int countFiles();
-void setTime();
-bool_t checkForStateChange();
-void insertHeaderToFile();
-void encrypt_cbc();
-void sendCyphertext();
-void sendCAN();
-void UartHC06Init();
-void initIVTMOD();
+void saveData(void);
+int receiveData(void);
+int countFiles(void);
+void setTime(void);
+bool_t checkForStateChange(void);
+void insertHeaderToFile(void);
+void encrypt_cbc(uint8_t in[64]);
+void sendCyphertext(void);
+void sendCAN(void);
+void initIVTMOD(void);
 void sendFrameToIVTMOD(uint8_t db0, uint8_t db1, uint8_t db2, uint8_t db3);
 
+// GLOBAL VARIABLES
+
 state_t state;
-interface_t interface;
+int32_t current;
+int32_t voltage;
+int32_t temperature;
+
 FATFS FatFs;
 FIL fil;
 DIR dj;
 FILINFO fno;
 
+interface_t interface;
 volatile uint32_t timer;
 volatile uint32_t oldtimerval;
-bool_t measureTemperature;
-volatile int ivtConfig;
-
-int32_t current;
-int32_t voltage;
-int32_t temperature;
-
-char buffer[64];
 uint8_t cyphertext[64];
-uint8_t measureout[9];
-volatile uint8_t measurein[9];
-volatile uint8_t configout[9];
-volatile uint8_t warmstartout[9];
-volatile uint8_t error;
-
-int savecounter;
-
-volatile uint32_t candata[8];
-volatile uint32_t cancounter;
-bool_t canactive;
-bool_t prevcanstate;
-uint8_t errorbits;
-uint32_t interrupttimer;
-uint32_t savedatatimer;
-uint32_t lastcantimer;
-
-volatile uint32_t temperaturecounter;
-
+bool_t canstate;
