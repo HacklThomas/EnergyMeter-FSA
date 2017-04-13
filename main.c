@@ -28,11 +28,11 @@ int main(void) {
 
 	while (1) {
 		switch (state) {
-		case INITIALISIEREN:
+		case INITIALISIEREN: // File wird angelegt
 			insertHeaderToFile();
 			state = LOGGING;
 			break;
-		case LOGGING:
+		case LOGGING: // Die eigentliche Datenspeicherung erfolgt im CAN-Interrupt -> Lib CAN2 ganz unten
 			if (checkForStateChange() == TRUE) {
 				f_close(&fil);
 				f_mount(0, "", 1);
