@@ -38,8 +38,8 @@ int main(void) {
 				f_mount(0, "", 1);
 			}
 			break;
-		case LISTFILES:
-			prevcanstate = canstate;
+		case LISTFILES: // Alle gesp. Filenamen werden ausgegeben
+			prevcanstate = canstate; // CAN wird während der Übertragung deaktiviert
 			canstate = FALSE;
 			Led_On(LED_RED);
 			f_mount(&FatFs, "", 1);
@@ -64,14 +64,14 @@ int main(void) {
 				f_open(&fil, "allFiles.txt", FA_READ);
 				f_lseek(&fil, pointer);
 			}
-			sendData("ENDE");
+			sendData("ENDE"); // Endekennung für Ausleseprogramm
 			f_close(&fil);
 			f_mount(0, "", 1);
 			Led_Off(LED_RED);
 			state = IDLE;
 			canstate = prevcanstate;
 			break;
-		case AUSLESEN:
+		case AUSLESEN: // Auslesen eines bestimmmten Files
 			prevcanstate = canstate;
 			canstate = FALSE;
 			f_mount(&FatFs, "", 1);
@@ -86,7 +86,7 @@ int main(void) {
 				f_gets(buffer, sizeof(buffer), &fil);
 				sendData(buffer);
 				temp++;
-				encrypt_cbc();
+				encrypt_cbc(); // Der Schlüssel wird über 200 Zeilen berechnet und dann ausgegeben
 				if (temp > 200) {
 					temp = 0;
 					sendCyphertext();
@@ -107,13 +107,13 @@ int main(void) {
 			}
 			canstate = prevcanstate;
 			break;
-		case SETTIME:
+		case SETTIME: // Einstellen der Uhrzeit für die RTC
 			Led_On(LED_RED);
 			setTime();
 			state = IDLE;
 			Led_Off(LED_RED);
 			break;
-		case BLUETOOTHGRAPH:
+		case BLUETOOTHGRAPH: // Mit einer Android App können die Daten in Echtzeit visualisiert werden
 			// SEQUENCE: "E902.0,123.4,193.43\n"
 			Led_On(LED_RED);
 			sprintf(buffer, "E%5.2lf,%5.2lf,%5.2lf\n", current / 1000.0,
@@ -123,7 +123,7 @@ int main(void) {
 				Led_Off(LED_RED);
 			}
 			break;
-		case DELETEFILES:
+		case DELETEFILES: // Löschen aller Files auf der SD Karte
 			Led_On(LED_RED);
 			f_mount(&FatFs, "", 1);
 			f_findfirst(&dj, &fno, "", "*.txt");
@@ -138,13 +138,13 @@ int main(void) {
 			Led_Off(LED_RED);
 			state = IDLE;
 			break;
-		case IDLE:
+		case IDLE: // Warten auf nächsten Befehl
 			Led_On(LED_ORANGE);
 			if (checkForStateChange()) {
 				Led_Off(LED_ORANGE);
 			}
 			break;
-		case TOGGLECAN:
+		case TOGGLECAN: // De-/Aktivieren der CAN Ausgabe
 			if (canstate == TRUE) {
 				canstate = FALSE;
 			} else {
