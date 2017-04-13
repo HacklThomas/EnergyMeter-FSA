@@ -35,7 +35,7 @@ void setTime() {
 }
 
 //--------------------------------------------------------------
-// Senden von Daten über UART und USB
+// Senden von Daten Ã¼ber UART und USB
 //--------------------------------------------------------------
 void sendData(char* data) {
 	if (interface == BLUETOOTH) {
@@ -46,7 +46,7 @@ void sendData(char* data) {
 }
 
 //--------------------------------------------------------------
-// Empfangen von Daten über UART und USB
+// Empfangen von Daten Ã¼ber UART und USB
 //--------------------------------------------------------------
 int receiveData() {
 	char data[5];
@@ -63,7 +63,7 @@ int receiveData() {
 }
 
 //--------------------------------------------------------------
-// Überprüfung, ob sich der Status geändert hat
+// ÃœberprÃ¼fung, ob sich der Status geÃ¤ndert hat
 //--------------------------------------------------------------
 bool_t checkForStateChange() {
 	int ret = receiveData();
@@ -96,7 +96,7 @@ bool_t checkForStateChange() {
 }
 
 //--------------------------------------------------------------
-// Zählen der Dateien auf der SD-Karte
+// ZÃ¤hlen der Dateien auf der SD-Karte
 //--------------------------------------------------------------
 int countFiles() {
 	int ret = 0;
@@ -149,9 +149,9 @@ void saveData() {
 	static int savecounter = 0;
 	char text[15];
 
-	// Daten an Dateiende anhängen
+	// Daten an Dateiende anhÃ¤ngen
 	f_lseek(&fil, f_size(&fil));
-	// Zeitdifferenz zum vorigen Wert einfügen
+	// Zeitdifferenz zum vorigen Wert einfÃ¼gen
 	snprintf(text, sizeof(text), "%ld\t\t", timer);
 	timer = 0;
 	f_puts(text, &fil);
@@ -172,7 +172,7 @@ void saveData() {
 	// Temperatur
 	snprintf(text, sizeof(text), "%5.1f\n", temperature / 1000.0);
 	f_puts(text, &fil);
-	// Jede Sekunde werden die Daten zwischengespeichert, um Datenverlust zu verhindern
+	// ca. jede Sekunde werden die Daten zwischengespeichert, um Datenverlust zu verhindern
 	savecounter++;
 	if (savecounter >= 200) {
 		f_sync(&fil);
@@ -181,7 +181,7 @@ void saveData() {
 }
 
 //--------------------------------------------------------------
-// Anelgen einer neuen Datei und Einfügen des Headers
+// Anelgen einer neuen Datei und EinfÃ¼gen des Headers
 //--------------------------------------------------------------
 void insertHeaderToFile() {
 	char text[40];
@@ -196,7 +196,7 @@ void insertHeaderToFile() {
 	if (f_open(&fil, "allFiles.txt", FA_CREATE_NEW) == FR_EXIST) {
 		f_open(&fil, "allFiles.txt", FA_WRITE);
 	}
-	// Ermitteln des nächsten Dateinamens
+	// Ermitteln des nÃ¤chsten Dateinamens
 	if (f_size(&fil) > 5) {
 		temp = countFiles();
 		temp++;
@@ -206,11 +206,12 @@ void insertHeaderToFile() {
 	f_lseek(&fil, f_size(&fil));
 	f_puts(text, &fil);
 	f_close(&fil);
-	// Einfügen allgemeiner Daten in die neue Datei
+	// EinfÃ¼gen allgemeiner Daten in die neue Datei
 	sprintf(text, "%i.txt", temp);
 	f_open(&fil, text, FA_CREATE_ALWAYS | FA_WRITE);
 	f_puts(buffer, &fil);
 	f_puts("\n", &fil);
+	// EinfÃ¼gen der Unique ID des Mikrocontrollers
 	sprintf(buffer, "Unique ID: 0x%08X 0x%08X 0x%08X\r\n", TM_ID_GetUnique32(0), // LSB
 			TM_ID_GetUnique32(1), TM_ID_GetUnique32(2) // MSB
 			);
@@ -220,7 +221,7 @@ void insertHeaderToFile() {
 }
 
 //--------------------------------------------------------------
-// Verschlüsseln der Daten
+// VerschlÃ¼sseln der Daten
 //--------------------------------------------------------------
 void encrypt_cbc() {
 	uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab,
@@ -253,31 +254,25 @@ void sendCyphertext() {
 }
 
 //--------------------------------------------------------------
-// Senden der Daten über CAN (Errorbits / Spannung / Strom / Temperatur)
+// Senden der Daten Ã¼ber CAN (Errorbits / Spannung / Strom / Temperatur)
 //--------------------------------------------------------------
 void sendCAN() {
 	CAN1_TX_FRAME_t TXFrame;
 	static int counter = 0;
-	static int counter2 = 125;
 
 	counter++;
-	if (counter > 100) {
+	if (counter > 10) {
 		counter = 0;
 		Led_Toggle(LED_RED);
 		TXFrame.can_id = 0x430;
 		TXFrame.anz_bytes = 8;
 		TXFrame.data[0] = 0;
 		TXFrame.data[1] = 0;
-		TXFrame.data[2] = counter2; //(uint8_t)((voltage / 1000.0) / 4);
+		TXFrame.data[2] = (uint8_t)((voltage / 1000.0) / 4);
 		TXFrame.data[3] = (uint8_t)(current / 1000.0);
 		TXFrame.data[4] = (uint8_t)(temperature / 1000.0);
 
 		UB_CAN1_send_std_data(TXFrame);
-		counter2++;
-		if (counter2 > 135) {
-			counter2 = 125;
-		}
-
 	}
 }
 
