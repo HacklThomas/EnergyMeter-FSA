@@ -15,7 +15,7 @@
 int main(int argc, const char * argv[]) {
     int i=1;
     int cport_nr=0;       /* /dev/ttyS0 (COM1 on windows) */
-    int bdrate=230400;       /* 9600 baud */
+    int bdrate=230400;      
     
     char mode[]={'8','N','1',0};
     char portname[50] = "/dev/";
@@ -175,11 +175,6 @@ int main(int argc, const char * argv[]) {
                     fputs((char *)buf, file);
                 }
                 
-                // END! in COIDE am Schluss senden -> folgende 2 Zeilen löschen
-                // Derzeit END! vor letztem Schlüssel
-                usleep(10000);
-                RS232_PollComport(cport_nr, buf, 1023);
-            
                 stateOfEM = 2;
                 system("clear");
                 printf("\n File Nr. %d downloaded\n\n", atoi(sendText));
@@ -221,7 +216,6 @@ int main(int argc, const char * argv[]) {
                         for (int i = 0; i < 64; i++) {
                             in[i] = buffer[i];
                         }
-                        
                         AES128_CBC_encrypt_buffer(cyphertext, in, 64, key, iv);
                     }
                 }
@@ -290,7 +284,7 @@ int main(int argc, const char * argv[]) {
                 stateOfEM = 3;
                 system("clear");
                 break;
-            case PLOTFILE:
+            case PLOTFILE: // Anzeigen von Strom/Spannung mit GNUPLOT
                 printf("Number of the File: ");
                 scanf("%d", &selection);
                 system("clear");
