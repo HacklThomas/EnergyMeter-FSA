@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <time.h>
 #include "serial.h"
 #include "aes.h"
@@ -29,9 +30,14 @@ typedef enum{
     DELETEFILES = 5,
     BLUETOOTHGRAPH = 6,
     PLOTFILE = 7,
-    DISCONNECT = 8,
-    ENDSESSION = 9,
-    CONNECTPORT = 10
+    TOGGLECAN = 8,
+    CLEARBUFFER = 9,
+    TERMINAL = 10,
+    DISCONNECT = 11,
+    ENDSESSION = 12,
+    CONNECTPORT = 13,
+    
+    TEST = 20
 } state_t;
 
 typedef enum{
@@ -42,6 +48,9 @@ typedef enum{
 
 //  --- FUNCTION DECARATIONS
 void printStateOfEM(int state);
-
+bool_t verify(int number);
+void calcCRC32_STM(uint32_t* crc, uint32_t data);
+void printprogressbar(int percent);
+void errorprint(char *s);
 
 #endif /* main_h */

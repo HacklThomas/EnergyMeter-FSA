@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc noversion nomachine -mcpu=cortex-m4 -mthumb -Wall -ffunction-sections -g -O0 -c -DSTM32F407VG -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -I..\..\..\workspace\em2.0\EnergyMeterFSA\library\fatfs\drivers -I..\..\..\workspace\em2.0\EnergyMeterFSA\cmsis -I..\..\..\workspace\em2.0\EnergyMeterFSA\cmsis_lib -I..\..\..\workspace\em2.0\EnergyMeterFSA\cmsis_lib\include -I..\..\..\workspace\EnergyMeterFSA -I..\..\..\workspace\em2.0\EnergyMeterFSA\library -I..\..\..\workspace\em2.0\EnergyMeterFSA\cmsis_boot -I..\..\..\workspace\em2.0\EnergyMeterFSA\library\fatfs -I..\..\..\workspace -I..\..\..\workspace\EnergyMeterFSA\library -I..\..\..\workspace\em2.0\EnergyMeterFSA -I..\..\..\workspace\em2.0\EnergyMeterFSA\library\usb_cdc_device -I..\..\..\workspace\em2.0">
+      <target file="syscalls.o" lastModified="15d0c892346">
+         <source file="..\..\..\syscalls\syscalls.c" lastModified="15baba58478"/>
+      </target>
+      <target file="usbd_usr.o" lastModified="15d0c890d18">
+         <source file="..\..\..\library\usb_cdc_device\usbd_usr.c" lastModified="15ba9acb600"/>
+      </target>
+      <target file="misc.o" lastModified="15d0c8929fa">
+         <source file="..\..\..\cmsis_lib\source\misc.c" lastModified="15ba9819ec0"/>
+      </target>
+      <target file="th_rtc.o" lastModified="15d0c891f40">
+         <source file="..\..\..\library\th_rtc.c" lastModified="15bb31c1dc0"/>
+      </target>
+      <target file="usbd_ioreq.o" lastModified="15d0c892d44">
+         <source file="..\..\..\library\usb_cdc_device\usbd_ioreq.c" lastModified="1483c899290"/>
+      </target>
+      <target file="th_rng.o" lastModified="15d0c8918da">
+         <source file="..\..\..\..\..\EnergyMeterFSA\library\th_rng.c" lastModified="15c45e56512"/>
+      </target>
+      <target file="functions.o" lastModified="15d0c9d6ef9">
+         <source file="..\..\..\functions.c" lastModified="15d0c9d6a28"/>
+      </target>
+      <target file="usbd_req.o" lastModified="15d0c892549">
+         <source file="..\..\..\library\usb_cdc_device\usbd_req.c" lastModified="1483c899290"/>
+      </target>
+      <target file="th_adc.o" lastModified="15d0c890bff">
+         <source file="..\..\..\library\th_adc.c" lastModified="15bb34afdc0"/>
+      </target>
+      <target file="diskio.o" lastModified="15d0c89115c">
+         <source file="..\..\..\library\fatfs\diskio.c" lastModified="15bae60fee0"/>
+      </target>
+      <target file="stm32f4xx_tim.o" lastModified="15d0c892e00">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_tim.c" lastModified="15ba98298c0"/>
+      </target>
+      <target file="usbd_cdc_core.o" lastModified="15d0c8927c8">
+         <source file="..\..\..\library\usb_cdc_device\usbd_cdc_core.c" lastModified="14bf6592bb0"/>
+      </target>
+      <target file="usbd_desc.o" lastModified="15d0c891e56">
+         <source file="..\..\..\library\usb_cdc_device\usbd_desc.c" lastModified="148513050d0"/>
+      </target>
+      <target file="stm32f4xx_exti.o" lastModified="15d0c8929cb">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_exti.c" lastModified="15ba9820838"/>
+      </target>
+      <target file="stm32f4xx_gpio.o" lastModified="15d0c892162">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_gpio.c" lastModified="15ba9796d18"/>
+      </target>
+      <target file="usb_bsp.o" lastModified="15d0c892401">
+         <source file="..\..\..\library\usb_cdc_device\usb_bsp.c" lastModified="15ba9a72438"/>
+      </target>
+      <target file="th_gpio.o" lastModified="15d0c891b4a">
+         <source file="..\..\..\library\th_gpio.c" lastModified="15bb33cb968"/>
+      </target>
+      <target file="usbd_core.o" lastModified="15d0c891496">
+         <source file="..\..\..\library\usb_cdc_device\usbd_core.c" lastModified="1483c899290"/>
+      </target>
+      <target file="th_crc.o" lastModified="15d0c892e3e">
+         <source file="..\..\..\library\th_crc.c" lastModified="15cc9c62f48"/>
+      </target>
+      <target file="stm32f4xx_usart.o" lastModified="15d0c890edc">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_usart.c" lastModified="15ba979e630"/>
+      </target>
+      <target file="stm32f4xx_rtc.o" lastModified="15d0c892c2c">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_rtc.c" lastModified="15ba9798870"/>
+      </target>
+      <target file="stm32f4xx_rcc.o" lastModified="15d0c8917a2">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_rcc.c" lastModified="15ba9794608"/>
+      </target>
+      <target file="th_led.o" lastModified="15d0c892124">
+         <source file="..\..\..\library\th_led.c" lastModified="15ba9afe280"/>
+      </target>
+      <target file="stm32f4xx_can.o" lastModified="15d0c8910df">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_can.c" lastModified="15ba97a0958"/>
+      </target>
+      <target file="stm32f4xx_pwr.o" lastModified="15d0c890f3a">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_pwr.c" lastModified="15ba9795990"/>
+      </target>
+      <target file="th_can2.o" lastModified="15d0c8bfc9e">
+         <source file="..\..\..\library\th_can2.c" lastModified="15d0c8bf6a6"/>
+      </target>
+      <target file="th_spi.o" lastModified="15d0c89189c">
+         <source file="..\..\..\library\th_spi.c" lastModified="15bb32c65b8"/>
+      </target>
+      <target file="stm32f4xx_rng.o" lastModified="15d0c89298d">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_rng.c" lastModified="15c45ccde8c"/>
+      </target>
+      <target file="stm32f4xx_adc.o" lastModified="15d0c891800">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_adc.c" lastModified="15ba979c308"/>
+      </target>
+      <target file="th_systick.o" lastModified="15d0c890e50">
+         <source file="..\..\..\library\th_systick.c" lastModified="15c17fc990e"/>
+      </target>
+      <target file="unicode.o" lastModified="15d0c890a69">
+         <source file="..\..\..\library\fatfs\option\unicode.c" lastModified="14b6fd41140"/>
+      </target>
+      <target file="usb_dcd.o" lastModified="15d0c892ac5">
+         <source file="..\..\..\library\usb_cdc_device\usb_dcd.c" lastModified="1483c899290"/>
+      </target>
+      <target file="startup_stm32f4xx.o" lastModified="15d0c891320">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f4xx.c" lastModified="15ba9794608"/>
+      </target>
+      <target file="fatfs_sd.o" lastModified="15d0c89186d">
+         <source file="..\..\..\library\fatfs\drivers\fatfs_sd.c" lastModified="15bae611268"/>
+      </target>
+      <target file="usbd_cdc_vcp.o" lastModified="15d0c8922aa">
+         <source file="..\..\..\library\usb_cdc_device\usbd_cdc_vcp.c" lastModified="15baba02d48"/>
+      </target>
+      <target file="th_can1.o" lastModified="15d0c891eb4">
+         <source file="..\..\..\library\th_can1.c" lastModified="15bb344e340"/>
+      </target>
+      <target file="stm32f4xx_crc.o" lastModified="15d0c89135e">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_crc.c" lastModified="15cc9c48cd2"/>
+      </target>
+      <target file="th_fatfs.o" lastModified="15d0c892b51">
+         <source file="..\..\..\library\th_fatfs.c" lastModified="15bb342a508"/>
+      </target>
+      <target file="th_aes.o" lastModified="15d0c892b9f">
+         <source file="..\..\..\library\th_aes.c" lastModified="15bb34a6180"/>
+      </target>
+      <target file="th_uart.o" lastModified="15d0c8912e2">
+         <source file="..\..\..\library\th_uart.c" lastModified="15c448aee85"/>
+      </target>
+      <target file="usb_core.o" lastModified="15d0c890bb1">
+         <source file="..\..\..\library\usb_cdc_device\usb_core.c" lastModified="1483c899290"/>
+      </target>
+      <target file="stm32f4xx_spi.o" lastModified="15d0c89294e">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_spi.c" lastModified="15ba979a3c8"/>
+      </target>
+      <target file="ff.o" lastModified="15d0c892900">
+         <source file="..\..\..\library\fatfs\ff.c" lastModified="14bb5aa4590"/>
+      </target>
+      <target file="main.o" lastModified="15d0c9fd46e">
+         <source file="..\..\..\main.c" lastModified="15d0c9fcf02"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="15d0c8922f8">
+         <source file="..\..\..\cmsis_boot\system_stm32f4xx.c" lastModified="15ba9794608"/>
+      </target>
+      <target file="usb_dcd_int.o" lastModified="15d0c892690">
+         <source file="..\..\..\library\usb_cdc_device\usb_dcd_int.c" lastModified="1483c899290"/>
+      </target>
+      <target file="th_usb_vcp.o" lastModified="15d0c891062">
+         <source file="..\..\..\library\th_usb_vcp.c" lastModified="15bb3ce3780"/>
+      </target>
+      <target file="syscall.o" lastModified="15d0c891ef2">
+         <source file="..\..\..\library\fatfs\option\syscall.c" lastModified="14d296b2020"/>
+      </target>
+   </processor>
+</history>

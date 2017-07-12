@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -Map=EnergyMeterFSA.map -O0 --gc-sections -LC:\CooCox\CoIDE\configuration\ProgramData\EnergyMeterFSA -TC:\CooCox\CoIDE\configuration\ProgramData\EnergyMeterFSA/arm-gcc-link.ld -g">
+      <target file="EnergyMeterFSA.elf" lastModified="15d0c9fd671">
+         <source file="..\obj\unicode.o" lastModified="15d0c890a69"/>
+         <source file="..\obj\usb_core.o" lastModified="15d0c890bb1"/>
+         <source file="..\obj\th_adc.o" lastModified="15d0c890bff"/>
+         <source file="..\obj\usbd_usr.o" lastModified="15d0c890d18"/>
+         <source file="..\obj\th_systick.o" lastModified="15d0c890e50"/>
+         <source file="..\obj\stm32f4xx_usart.o" lastModified="15d0c890edc"/>
+         <source file="..\obj\stm32f4xx_pwr.o" lastModified="15d0c890f3a"/>
+         <source file="..\obj\th_usb_vcp.o" lastModified="15d0c891062"/>
+         <source file="..\obj\stm32f4xx_can.o" lastModified="15d0c8910df"/>
+         <source file="..\obj\diskio.o" lastModified="15d0c89115c"/>
+         <source file="..\obj\th_uart.o" lastModified="15d0c8912e2"/>
+         <source file="..\obj\startup_stm32f4xx.o" lastModified="15d0c891320"/>
+         <source file="..\obj\stm32f4xx_crc.o" lastModified="15d0c89135e"/>
+         <source file="..\obj\usbd_core.o" lastModified="15d0c891496"/>
+         <source file="..\obj\main.o" lastModified="15d0c9fd46e"/>
+         <source file="..\obj\stm32f4xx_rcc.o" lastModified="15d0c8917a2"/>
+         <source file="..\obj\stm32f4xx_adc.o" lastModified="15d0c891800"/>
+         <source file="..\obj\fatfs_sd.o" lastModified="15d0c89186d"/>
+         <source file="..\obj\th_spi.o" lastModified="15d0c89189c"/>
+         <source file="..\obj\th_rng.o" lastModified="15d0c8918da"/>
+         <source file="..\obj\functions.o" lastModified="15d0c9d6ef9"/>
+         <source file="..\obj\th_gpio.o" lastModified="15d0c891b4a"/>
+         <source file="..\obj\usbd_desc.o" lastModified="15d0c891e56"/>
+         <source file="..\obj\th_can1.o" lastModified="15d0c891eb4"/>
+         <source file="..\obj\syscall.o" lastModified="15d0c891ef2"/>
+         <source file="..\obj\th_rtc.o" lastModified="15d0c891f40"/>
+         <source file="..\obj\th_can2.o" lastModified="15d0c8bfc9e"/>
+         <source file="..\obj\th_led.o" lastModified="15d0c892124"/>
+         <source file="..\obj\stm32f4xx_gpio.o" lastModified="15d0c892162"/>
+         <source file="..\obj\usbd_cdc_vcp.o" lastModified="15d0c8922aa"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="15d0c8922f8"/>
+         <source file="..\obj\syscalls.o" lastModified="15d0c892346"/>
+         <source file="..\obj\usb_bsp.o" lastModified="15d0c892401"/>
+         <source file="..\obj\usbd_req.o" lastModified="15d0c892549"/>
+         <source file="..\obj\usb_dcd_int.o" lastModified="15d0c892690"/>
+         <source file="..\obj\usbd_cdc_core.o" lastModified="15d0c8927c8"/>
+         <source file="..\obj\ff.o" lastModified="15d0c892900"/>
+         <source file="..\obj\stm32f4xx_spi.o" lastModified="15d0c89294e"/>
+         <source file="..\obj\stm32f4xx_rng.o" lastModified="15d0c89298d"/>
+         <source file="..\obj\stm32f4xx_exti.o" lastModified="15d0c8929cb"/>
+         <source file="..\obj\misc.o" lastModified="15d0c8929fa"/>
+         <source file="..\obj\usb_dcd.o" lastModified="15d0c892ac5"/>
+         <source file="..\obj\th_fatfs.o" lastModified="15d0c892b51"/>
+         <source file="..\obj\th_aes.o" lastModified="15d0c892b9f"/>
+         <source file="..\obj\stm32f4xx_rtc.o" lastModified="15d0c892c2c"/>
+         <source file="..\obj\usbd_ioreq.o" lastModified="15d0c892d44"/>
+         <source file="..\obj\stm32f4xx_tim.o" lastModified="15d0c892e00"/>
+         <source file="..\obj\th_crc.o" lastModified="15d0c892e3e"/>
+      </target>
+   </processor>
+</history>
