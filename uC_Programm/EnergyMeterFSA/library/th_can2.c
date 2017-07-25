@@ -328,20 +328,19 @@ void CAN2_RX0_IRQHandler(void) {
 					+ (CAN2_RxMessage.Data[3] * 0x10000)
 					+ (CAN2_RxMessage.Data[4] * 0x100)
 					+ (CAN2_RxMessage.Data[5]);
+			/*if (canstate) {
+				counter++;
+				if (counter > 9) {
+					sendCAN();
+					counter = 0;
+				}
+			}*/
 		}
 		if (CAN2_RxMessage.StdId == 0x525) { // Temperature
 			temperature = (CAN2_RxMessage.Data[2] * 0x1000000)
 					+ (CAN2_RxMessage.Data[3] * 0x10000)
 					+ (CAN2_RxMessage.Data[4] * 0x100)
 					+ (CAN2_RxMessage.Data[5]);
-		}
-
-		if (canstate) {
-			counter++;
-			if (counter > 5) {
-				sendCAN();
-				counter = 0;
-			}
 		}
 	}
 	interrupttimer = 0;

@@ -27,6 +27,7 @@
 
 #define ENCRYPTION
 #define DELETECODE 3528
+#define TIMECODE 4827
 
 typedef enum {
 	INITIALISIEREN = 0,
@@ -41,7 +42,7 @@ typedef enum {
 	LISTFILES = 9,
 	TOGGLECAN = 10,
 	DELETEINITFILE = 11,
-	SETHC = 12,
+	SETBTNAME = 12,
 
 	TEST = 20
 } state_t;
@@ -68,6 +69,7 @@ void sendZeilen();
 void sendCAN();
 void initIVTMOD();
 void sendFrameToIVTMOD(uint8_t db0, uint8_t db1, uint8_t db2, uint8_t db3);
+void setBTName();
 
 state_t state;
 int32_t current;
@@ -86,8 +88,10 @@ volatile uint32_t blink;
 volatile uint32_t interrupttimer;
 uint8_t cyphertext[16];
 char buffer[64];
+char buffer2[64];
 bool_t canstate;
 bool_t hcreceive;
 bool_t ivterror;
+bool_t carderror;
 bool_t syncing;
 

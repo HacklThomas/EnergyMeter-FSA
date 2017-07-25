@@ -29,7 +29,7 @@
 //             100 ->  20 kBit/sec  [FRQ = 20 kHz]
 //             200 ->  10 kBit/sec  [FRQ = 10 kHz]
 //--------------------------------------------------------------
-#define   CAN1_CLOCK_PRESCALER    4
+#define   CAN1_CLOCK_PRESCALER    2
 
 typedef struct {
   GPIO_TypeDef* PORT;     // Port

@@ -80,6 +80,7 @@ void TH_SYSTICK_Pause_s(volatile uint32_t pause) {
 // Systic-Interrupt
 //--------------------------------------------------------------
 void SysTick_Handler(void) {
+	static int cantimer = 0;
 	// Tick für Pause
 	if (Systick_Delay != 0x00) {
 		Systick_Delay--;
@@ -92,6 +93,14 @@ void SysTick_Handler(void) {
 		}
 	} else {
 		temporary++;
+	}
+
+	cantimer++;
+	if (canstate == TRUE) {
+		if (cantimer > 50000) {
+			cantimer = 0;
+			sendCAN();
+		}
 	}
 	timer++;
 	blink++;

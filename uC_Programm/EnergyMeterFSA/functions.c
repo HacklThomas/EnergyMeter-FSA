@@ -7,7 +7,7 @@ void setTime() {
 	int eingabe;
 	do {
 		eingabe = receiveData();
-	} while (eingabe == -1);
+	} while (eingabe < 15);
 	TH_RTC.jahr = eingabe;
 	do {
 		eingabe = receiveData();
@@ -77,7 +77,7 @@ bool_t checkForStateChange() {
 	} else if (ret == 3) {
 		state = AUSLESEN;
 		return TRUE;
-	} else if (ret == 4) {
+	} else if (ret == TIMECODE) {
 		state = SETTIME;
 		return TRUE;
 	} else if (ret == 5) {
@@ -97,6 +97,9 @@ bool_t checkForStateChange() {
 		return TRUE;
 	} else if (ret == 10) {
 		state = TEST;
+		return TRUE;
+	} else if (ret == 11) {
+		state = SETBTNAME;
 		return TRUE;
 	}
 	return FALSE;
@@ -141,18 +144,40 @@ void init() {
 
 	CAN2_RX_FRAME_t rxframe;
 
-	TH_LED_Off(LED_RED);
-
 	int i = 0;
 	int serial = 0;
 
 	f_mount(&FatFs, "", 1);
 
+	// Speichern der IVT MOD Seriennummer in File (nur beim allerersten Programmstart)
+	if (f_open(&initfile, "ivtserial.txt", FA_CREATE_ALWAYS | FA_WRITE)
+			== FR_OK) {
+		if (f_size(&initfile) < 4) {
+			do {
+				if (timer > 200000) {
+					i++;
+					timer = 0;
+				}
+				if (i > 4) {
+					i = 0;
+					break;
+				}
+				sendFrameToIVTMOD(0x7B, 0x00, 0x00, 0x00); // Get Serial Number
+				TH_CAN2_receive(&rxframe);
+			} while (rxframe.data[0] != 0xBB);
+			serial = (rxframe.data[1] * 0x1000000) + (rxframe.data[2] * 0x10000)
+					+ (rxframe.data[3] * 0x100) + (rxframe.data[4]);
+			sprintf(buffer, "%d\n", serial);
+			f_puts("IVT MOD Serial Number: ", &initfile);
+			f_puts(buffer, &initfile);
+		}
+	}
+	f_close(&initfile);
+
 	// Konfigurieren des Bluetooth Moduls (nur beim allerersten Programmstart)
 	if (f_open(&initfile, "initfile.txt", FA_CREATE_NEW) != FR_EXIST) {
 		// BLUTOOTH MODULE CONFIG
 		TH_UART_Init(0);
-		TH_LED_On(LED_RED);
 		f_close(&initfile);
 
 		timer = 0;
@@ -169,50 +194,22 @@ void init() {
 				break;
 			}
 		}
-		TH_LED_Off(LED_RED);
 		TH_UART_Init(1);
-		TH_SYSTICK_Pause_ms(2000);
-		timer = 0;
-		TH_UART_SendString(COM1, "AT+NAMEEnergyMeter1", NONE);
-		while (hcreceive == FALSE) {
-			TH_LED_On(LED_RED);
-			if (timer > 2000000) {
-				i++;
-				TH_UART_SendString(COM1, "AT+NAMEEnergyMeter1", NONE);
-				timer = 0;
-			}
-			if (i > 4) {
-				break;
-			}
-		}
-		TH_LED_Off(LED_RED);
+		setBTName();
 	}
-	TH_UART_Init(1);
-
-	// Speichern der IVT MOD Seriennummer in File (nur beim allerersten Programmstart)
-	if (f_open(&initfile, "ivtserial.txt", FA_CREATE_ALWAYS | FA_WRITE)
-			== FR_OK) {
-		if (f_size(&initfile) < 4) {
-			do {
-				sendFrameToIVTMOD(0x7B, 0x00, 0x00, 0x00); // Get Serial Number
-				TH_CAN2_receive(&rxframe);
-			} while (rxframe.data[0] != 0xBB);
-			serial = (rxframe.data[1] * 0x1000000) + (rxframe.data[2] * 0x10000)
-					+ (rxframe.data[3] * 0x100) + (rxframe.data[4]);
-			sprintf(buffer, "%d\n", serial);
-			f_puts("IVT MOD Serial Number: ", &initfile);
-			f_puts(buffer, &initfile);
-		}
-	}
-	f_close(&initfile);
 
 	// Check ob CAN aktiviert ist
-	if (f_open(&initfile, "canactive.txt", FA_OPEN_EXISTING) != FR_OK) {
-		canstate = FALSE;
-	} else {
+	if (f_open(&initfile, "candeactive.txt", FA_OPEN_EXISTING) != FR_OK) {
 		canstate = TRUE;
+	} else {
+		canstate = FALSE;
 		f_close(&initfile);
 	}
+
+	if (f_open(&fil, "allFiles.txt", FA_CREATE_NEW) == FR_EXIST) {
+		f_open(&fil, "allFiles.txt", FA_WRITE);
+	}
+	f_close(&fil);
 
 	f_mount(0, "", 1);
 
@@ -220,7 +217,9 @@ void init() {
 	timer = 0;
 	ivterror = FALSE;
 	syncing = FALSE;
+	carderror = FALSE;
 
+	TH_LED_Off(LED_RED);
 	return;
 }
 
@@ -233,7 +232,11 @@ void saveData() {
 	double lowvoltage = (TH_ADC_Read(ADC1, ADC_Channel_10) / 4096.0) * 3 * 48;
 
 	// Daten an Dateiende anhängen
-	f_lseek(&fil, f_size(&fil));
+	if (f_lseek(&fil, f_size(&fil)) == FR_OK) {
+		carderror = FALSE;
+	} else {
+		carderror = TRUE;
+	}
 	// Zeitdifferenz zum vorigen Wert einfügen
 	snprintf(text, sizeof(text), "%ld\t\t", timer);
 	timer = 0;
@@ -263,7 +266,11 @@ void insertHeaderToFile() {
 	TH_RTC_GetClock(RTC_DEC);
 	sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d", TH_RTC.tag, TH_RTC.monat,
 			TH_RTC.jahr + 2000, TH_RTC.std, TH_RTC.min, TH_RTC.sek);
-	f_mount(&FatFs, "", 1);
+	if (f_mount(&FatFs, "", 1) == FR_OK) {
+		carderror = FALSE;
+	} else {
+		carderror = TRUE;
+	}
 	// Falls es die allg. Datei "allFiles" noch nicht gibt, wird sie neu angelegt
 	if (f_open(&fil, "allFiles.txt", FA_CREATE_NEW) == FR_EXIST) {
 		f_open(&fil, "allFiles.txt", FA_WRITE);
@@ -286,7 +293,11 @@ void insertHeaderToFile() {
 
 	// Einfügen allgemeiner Daten in die neue Datei
 	sprintf(text, "%i.txt", temp);
-	f_open(&fil, text, FA_CREATE_ALWAYS | FA_WRITE);
+	if (f_open(&fil, text, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK) {
+		carderror = FALSE;
+	} else {
+		carderror = TRUE;
+	}
 	f_puts(buffer, &fil);
 	f_puts("\n", &fil);
 	sprintf(buffer, "\nuC unique ID: 0x%08X 0x%08X 0x%08X\r\n",
@@ -345,18 +356,48 @@ void sendCyphertext() {
 //--------------------------------------------------------------
 void sendCAN() {
 	CAN1_TX_FRAME_t TXFrame;
+	static uint8_t counter = 0;
+	static int32_t power = 0;
+
+	power = (current / 1000.0) * (voltage / 1000.0);
 
 	TXFrame.can_id = 0x430;
 	TXFrame.anz_bytes = 8;
-	TXFrame.data[0] = 0;
-	if (ivterror) {
-		TXFrame.data[1] = 1;
+	TXFrame.data[0] = counter;
+	TXFrame.data[1] = 0;
+	counter++;
+	if (ivterror == TRUE) {
+		TXFrame.data[1] |= 0b10000000;
 	} else {
-		TXFrame.data[1] = 0;
+		TXFrame.data[1] &= 0b01111111;
 	}
-	TXFrame.data[2] = (uint8_t) ((voltage / 1000.0) / 4);
-	TXFrame.data[3] = (uint8_t) (current / 1000.0);
-	TXFrame.data[4] = (uint8_t) (temperature / 1000.0);
+	if (state == LOGGING) {
+		TXFrame.data[1] |= 0b00010000;
+	} else {
+		TXFrame.data[1] &= 0b11101111;
+	}
+	if (carderror == TRUE) {
+		TXFrame.data[1] |= 0b00000010;
+	} else {
+		TXFrame.data[1] &= 0b11111101;
+	}
+	/*if (voltage > 600000) {
+	 TXFrame.data[1] |= 0b00010000;
+	 } else {
+	 TXFrame.data[1] &= 0b11101111;
+	 }
+	 if (power > 80000) {
+	 TXFrame.data[1] |= 0b00001000;
+	 } else {
+	 TXFrame.data[1] &= 0b11110111;
+	 }*/
+
+	TXFrame.data[2] = ((int16_t)(power / 3)) >> 8;
+	TXFrame.data[3] = (int16_t)(power / 3);
+	TXFrame.data[4] = ((int16_t)(voltage / 40.0)) >> 8;
+	TXFrame.data[5] = (int16_t)(voltage / 40.0);
+	TXFrame.data[6] = ((int16_t)(current / 50.0)) >> 8;
+	TXFrame.data[7] = (int16_t)(current / 50.0);
 
 	TH_CAN1_send_std_data(TXFrame);
 }
@@ -398,5 +439,47 @@ void sendFrameToIVTMOD(uint8_t db0, uint8_t db1, uint8_t db2, uint8_t db3) {
 
 	TH_CAN2_send_std_data(transmit);
 	TH_SYSTICK_Pause_ms(5);
+}
+
+void setBTName() {
+	if (f_open(&initfile, "ivtserial.txt", FA_READ) == FR_OK) {
+		f_gets(buffer, sizeof(buffer), &initfile);
+
+		buffer[0] = 'E';
+		buffer[1] = 'M';
+		buffer[2] = ' ';
+		buffer[3] = buffer[23];
+		buffer[4] = buffer[24];
+		buffer[5] = buffer[25];
+		buffer[6] = buffer[26];
+		buffer[7] = 0;
+		sprintf(buffer2, "AT+NAME%s", buffer);
+
+		hcreceive = FALSE;
+		timer = 0;
+		int i = 0;
+
+		TH_UART_SendString(COM1, buffer2, NONE);
+		while (hcreceive == FALSE) {
+			if (timer > 2000000) {
+				i++;
+				TH_UART_SendString(COM1, buffer2, NONE);
+				timer = 0;
+			}
+			if (i > 4) {
+				//sendData("EM: No Response of BT Module\r\n");
+				break;
+			}
+		}
+		if (hcreceive == TRUE) {
+			//sendData("EM: Bluetooth Name configured: ");
+			//sendData(buffer);
+			//sendData("\r\n");
+		}
+		f_close(&initfile);
+	} else {
+		//sendData("EM: No ivtserial.txt existing\r\n");
+	}
+	return;
 }
 

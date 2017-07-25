@@ -26,6 +26,8 @@ int main(void) {
 	int temp = 0;
 	bool_t prevcanstate;
 
+	int i = 0;
+
 	bool_t crcinit = TRUE;
 	uint32_t crcresult;
 	int cryptcounter = 0;
@@ -37,6 +39,12 @@ int main(void) {
 	uint8_t in[16];
 
 	while (1) {
+		if (interrupttimer > 50000) {
+			ivterror = TRUE;
+			sendFrameToIVTMOD(0x34, 0x01, 0x01, 0x00); // START
+		} else {
+			ivterror = FALSE;
+		}
 		switch (state) {
 		case INITIALISIEREN:
 			TH_LED_Off(LED_RED);
@@ -45,14 +53,6 @@ int main(void) {
 			state = LOGGING;
 			break;
 		case LOGGING:
-			if (interrupttimer > 50000) {
-				ivterror = TRUE;
-				TH_LED_Off(LED_GREEN);
-				TH_LED_On(LED_RED);
-			} else {
-				ivterror = FALSE;
-				TH_LED_Off(LED_RED);
-			}
 			if (blink >= 1000000) {
 				blink = 0;
 				TH_LED_Toggle(LED_GREEN);
@@ -63,7 +63,7 @@ int main(void) {
 				TH_LED_Off(LED_GREEN);
 			}
 #if defined (MINVOLTAGE)
-			if (voltage < (MINVOLTAGE - 2000)) { //Spannung fällt unter Schwelle
+			if (voltage < (MINVOLTAGE - 1000)) { //Spannung fällt unter Schwelle
 				f_close(&fil);
 				f_mount(0, "", 1);
 				TH_LED_Off(LED_GREEN);
@@ -77,25 +77,28 @@ int main(void) {
 			canstate = FALSE;
 			f_mount(&FatFs, "", 1);
 			temp = countFiles();
-			f_open(&fil, "allFiles.txt", FA_READ);
-			f_lseek(&fil, 0);
-			for (int i = 1; i <= temp; i++) {
-				f_gets(buffer, sizeof(buffer), &fil);
-				pointer = f_tell(&fil);
-				f_close(&fil);
-				ret = strlen(buffer);
-				ret--;
-				buffer[ret] = 0x00;
-				sendData(buffer);
-				sendData(" - Size (kB): ");
-				sprintf(buffer, "%i.txt", i);
-				f_open(&fil, buffer, FA_READ);
-				itoa((f_size(&fil) / 1000), buffer, 10);
-				sendData(buffer);
-				sendData("\n");
-				f_close(&fil);
-				f_open(&fil, "allFiles.txt", FA_READ);
-				f_lseek(&fil, pointer);
+			if (f_open(&fil, "allFiles.txt", FA_READ) == FR_OK) {
+				f_lseek(&fil, 0);
+				for (i = 1; i <= temp; i++) {
+					f_gets(buffer, sizeof(buffer), &fil);
+					pointer = f_tell(&fil);
+					f_close(&fil);
+					ret = strlen(buffer);
+					ret--;
+					buffer[ret] = 0x00;
+					sendData(buffer);
+					sendData(" - Size (kB): ");
+					sprintf(buffer, "%i.txt", i);
+					f_open(&fil, buffer, FA_READ);
+					itoa((f_size(&fil) / 1000), buffer, 10);
+					sendData(buffer);
+					sendData("\n");
+					f_close(&fil);
+					f_open(&fil, "allFiles.txt", FA_READ);
+					f_lseek(&fil, pointer);
+				}
+			} else {
+				sendData("Allfiles.txt missing\r\n");
 			}
 			sendData("ENDE\r\n");
 			f_close(&fil);
@@ -144,7 +147,7 @@ int main(void) {
 						in[3] = crcresult & 0x000000FF;
 						in[7] = in[11] = in[15] = in[3];
 
-						for (int i = 0; i < 16; i++) {
+						for (i = 0; i < 16; i++) {
 							cyphertext[i] = 0x00;
 						}
 
@@ -170,7 +173,7 @@ int main(void) {
 			in[3] = crcresult & 0x000000FF;
 			in[7] = in[11] = in[15] = in[3];
 
-			for (int i = 0; i < 16; i++) {
+			for (i = 0; i < 16; i++) {
 				cyphertext[i] = 0x00;
 			}
 
@@ -187,7 +190,12 @@ int main(void) {
 		case SETTIME:
 			TH_LED_On(LED_RED);
 			setTime();
-			sendData("EM: Time set\r\n");
+			sendData("EM: Time set: ");
+			TH_RTC_GetClock(RTC_DEC);
+			sprintf(buffer, "%02d.%02d.%04d %02d:%02d:%02d\r\n", TH_RTC.tag,
+					TH_RTC.monat, TH_RTC.jahr + 2000, TH_RTC.std, TH_RTC.min,
+					TH_RTC.sek);
+			sendData(buffer);
 			state = IDLE;
 			TH_LED_Off(LED_RED);
 			break;
@@ -206,7 +214,7 @@ int main(void) {
 			f_mount(&FatFs, "", 1);
 			f_findfirst(&dj, &fno, "", "*.txt");
 			while (fno.fname[0]) {
-				if ((strcmp(fno.fname, "canactive.txt") != 0)
+				if ((strcmp(fno.fname, "candeactive.txt") != 0)
 						&& (strcmp(fno.fname, "initfile.txt") != 0)
 						&& (strcmp(fno.fname, "ivtserial.txt") != 0)) {
 					f_unlink(fno.fname);
@@ -222,6 +230,7 @@ int main(void) {
 			TH_LED_Off(LED_RED);
 			break;
 		case IDLE:
+			TH_LED_Off(LED_RED);
 			TH_LED_On(LED_GREEN);
 			if (checkForStateChange()) {
 				TH_LED_Off(LED_GREEN);
@@ -235,15 +244,16 @@ int main(void) {
 		case TOGGLECAN:
 			TH_LED_On(LED_RED);
 			f_mount(&FatFs, "", 1);
-			if (canstate == TRUE) {
-				f_unlink("canactive.txt");
-				sendData("EM: CAN disabled\r\n");
-				canstate = FALSE;
-			} else {
-				f_open(&initfile, "canactive.txt", FA_CREATE_ALWAYS | FA_WRITE);
-				f_close(&initfile);
+			if (canstate == FALSE) {
+				f_unlink("candeactive.txt");
 				sendData("EM: CAN enabled\r\n");
 				canstate = TRUE;
+			} else {
+				f_open(&initfile, "candeactive.txt",
+						FA_CREATE_ALWAYS | FA_WRITE);
+				f_close(&initfile);
+				sendData("EM: CAN disabled\r\n");
+				canstate = FALSE;
 			}
 			state = IDLE;
 			f_mount(0, "", 1);
@@ -253,9 +263,10 @@ int main(void) {
 			TH_LED_On(LED_RED);
 			f_mount(&FatFs, "", 1);
 			f_unlink("initfile.txt");
+			f_unlink("ivtserial.txt");
 			f_mount(0, "", 1);
 			TH_LED_Off(LED_RED);
-			sendData("EM: Init File Deleted\r\n");
+			sendData("EM: Init File deleted\r\n");
 			state = IDLE;
 			break;
 		default:
